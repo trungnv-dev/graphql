@@ -1,0 +1,65 @@
+Graph Query Language (Facebook phát triển)
+1. Chỉ có 1 end point duy nhất
+2. Query data linh động
+3. Cấu trúc
+  -Query: Các câu lệnh lấy dữ liệu (tương tự method GET trong REST API)
+  -Mutation: Các câu lệnh để thêm/sửa dữ liệu (tuơng tự method POST/PUT/DELETE trong REST API)
+  -Subscription: Câu lệnh dùng để lắng nghe sự kiên trên server, khi dữ liệu trên server được thay đổi nó cũng thay đổi theo nhằm cung cấp dữ liệu cho client một cách realtime nhất có thể. Ở điểm này REST API không có cửa để đấu lại với GraphQL.
+
+
+GraphQL in Laravel
+// Install library
+composer require rebing/graphql-laravel
+
+// Pushlish vendor
+php artisan vendor:publish --provider="Rebing\GraphQL\GraphQLServiceProvider"
+
+// Make model and migration
+php artisan make:model Book -m
+
+// Make seeder
+php artisan make:seeder BookSeeder
+
+// Run migrate and seeder
+php artisan migrate --seed
+
+// Building GraphQL Server
+1. Make types, queries and mutations with graphql
+  - Types:
+    - Thực hiện liên kết với Model, khai báo name Type và list ra các fields của model
+    - Khởi tạo nhanh: php artisan make:graphql:type BookType
+  - Queries:
+    - Thực hiện get
+    - Khởi tạo nhanh: php artisan make:graphql:query BookQuery
+  - Mutations:
+    - Thực hiện create, update, delete
+    - Khởi tạo nhanh: php artisan make:graphql:mutation CreateBookMutation
+
+2. Các method:
+  - Types:
+    - function fields(): list các field có thể respone về cho client
+  - Queries and Mutations:
+    - function type(): định nghĩa type trả về của class hiện tại sau khi resolve xong
+    - function args(): list các field cho phép client gửi lên server và validate các field đó (có thể validate ở function rules)
+    - function resolve(): handle request từ client and respone result về client
+    - protected function rules(): validate các field
+    - function validationErrorMessages(): custom errorMsg
+
+3. Regist các types, queries and mutations vào schemas.default trong app/config/graphql.php
+
+4. Url
+ - {domain}/graphql
+ - thay đổi trong route.prefix trong app/config/graphql.php
+
+// config/graphql.php
+1. route:
+  - prefix: endpoint của graphql
+  - middleware: apply to all schemas
+
+2. default_schema: mặc định là schemas.default
+
+3. schemas:
+  - có thể khai báo nhiều schemas, mỗi schemas sẽ có các query, mutation, types, middleware, method, execution_middleware riêng
+  - Trong đó, với types và middleware có thể khai báo chung ở các biến types và middleware trong file này
+
+4. types, execution_middleware
